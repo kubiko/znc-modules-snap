@@ -6,6 +6,7 @@ description: |
 confinement: strict
 grade: stable
 adopt-info: znc
+base: core18
 
 slots:
     modules:
@@ -30,7 +31,6 @@ parts:
             - libssl-dev
             - pkg-config
             - python3-dev
-            - python-software-properties
             - swig3.0
             - tcl-dev
         prime:
@@ -100,8 +100,8 @@ parts:
         after:
             - znc
         plugin: dump
-        source: https://bitbucket.org/jmclough/mutter-push/get/master.zip
+        source: https://github.com/seansweda/mutter-push.git
         organize:
-            '*/mutter.py': modules/
+            'mutter.py': modules/mutter.py
         prime:
             - modules
