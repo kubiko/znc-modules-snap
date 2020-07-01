@@ -18,6 +18,7 @@ slots:
 parts:
     znc:
         plugin: nil
+        source: https://github.com/znc/znc.git
         override-pull: |
             # decide what version to build
             # modules need to match version of znc in given channel
