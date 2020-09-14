@@ -31,9 +31,10 @@ parts:
             else
                 snap download znc-ondra --edge
             fi
-            unsquashfs -d snap znc-ondra*.snap -e usr
+            unsquashfs -d snap znc-ondra*.snap -e usr meta
+            snap_version=$(grep "version:" snap/meta/snap.yaml | awk '{print $2}')
+            snapcraftctl set-version ${snap_version}
             mv snap/usr ${SNAPCRAFT_PART_INSTALL}/
-            snapcraftctl set-version $(grep "VERSION_STR" ${SNAPCRAFT_PART_INSTALL}/usr/include/znc/version.h | awk '{print $3}' | sed 's/\"//g')
         prime:
             - -usr
 
