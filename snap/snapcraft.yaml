@@ -6,115 +6,123 @@ description: |
 confinement: strict
 grade: stable
 adopt-info: znc
-base: core18
+base: core24
+
+platforms:
+  arm64:
+  armhf:
+  amd64:
+  ppc64el:
+  riscv64:
+  s390x:
 
 slots:
-    modules:
-        interface: content
-        content: modules
-        read:
-            - $SNAP/modules
+  modules:
+    interface: content
+    content: modules
+    read:
+      - $SNAP/modules
 
 parts:
-    znc:
-        plugin: nil
-        source: https://github.com/znc/znc.git
-        override-pull: |
-            # decide what version to build
-            # modules need to match version of znc in given channel
-            # check versions of znc and znc-modules in beta channels, of does not match
-            # build against beta, otherwise build agains edge
-            znc_beta="$(snap info znc-ondra | awk '$1 == "latest/beta:" { print $2 }')"
-            znc_modules_beta="$(snap info ${SNAPCRAFT_PROJECT_NAME} | awk '$1 == "latest/beta:" { print $2 }')"
-            if [ "${znc_beta}" != "${znc_modules_beta}" ]; then
-                snap download znc-ondra --beta
-            else
-                snap download znc-ondra --edge
-            fi
-            unsquashfs -d snap znc-ondra*.snap -e usr meta
-            snap_version=$(grep "version:" snap/meta/snap.yaml | awk '{print $2}')
-            snapcraftctl set-version ${snap_version}
-            mv snap/usr ${SNAPCRAFT_PART_INSTALL}/
-        prime:
-            - -usr
+  znc:
+    plugin: nil
+    source: https://github.com/znc/znc.git
+    override-pull: |
+      # decide what version to build
+      # modules need to match version of znc in given channel
+      # check versions of znc and znc-modules in beta channels, of does not match
+      # build against beta, otherwise build agains edge
+      znc_beta="$(snap info znc-ondra | awk '$1 == "latest/beta:" { print $2 }' || true)"
+      znc_modules_beta="$(snap info ${CRAFT_PROJECT_NAME} | awk '$1 == "latest/beta:" { print $2 }' || true)"
+      if [ "${znc_beta}" != "${znc_modules_beta}" ]; then
+        snap download znc-ondra --beta
+      else
+        snap download znc-ondra --edge
+      fi
+      unsquashfs -d snap znc-ondra*.snap -e usr meta
+      snap_version=$(grep "version:" snap/meta/snap.yaml | awk '{print $2}')
+      craftctl set version=${snap_version}
+      mv snap/usr ${CRAFT_PART_INSTALL}/
+    prime:
+      - -usr
 
-    colloquypush:
-        after:
-            - znc
-        plugin: nil
-        source: https://github.com/kubiko/colloquypush.git
-        source-type: git
-        override-build: |
-            znc-buildmod znc/colloquy.cpp
-            cp *.so ${SNAPCRAFT_PART_INSTALL}
-        organize:
-            '*.so': modules/
+  colloquypush:
+    after:
+      - znc
+    plugin: nil
+    source: https://github.com/kubiko/colloquypush.git
+    source-type: git
+    override-build: |
+      znc-buildmod znc/colloquy.cpp
+      cp *.so ${CRAFT_PART_INSTALL}
+    organize:
+      '*.so': modules/
 
-    znc-palaver:
-        after:
-            - znc
-        plugin: nil
-        source: https://github.com/Palaver/znc-palaver.git
-        source-type: git
-        override-build: |
-            znc-buildmod palaver.cpp
-            cp *.so ${SNAPCRAFT_PART_INSTALL}
-        organize:
-            '*.so': modules/
+  znc-palaver:
+    after:
+      - znc
+    plugin: nil
+    source: https://github.com/Palaver/znc-palaver.git
+    source-type: git
+    override-build: |
+      znc-buildmod palaver.cpp
+      cp *.so ${CRAFT_PART_INSTALL}
+    organize:
+      '*.so': modules/
 
-    znc-playback:
-        after:
-            - znc
-        plugin: nil
-        source: https://github.com/jpnurmi/znc-playback.git
-        source-type: git
-        override-build: |
-            znc-buildmod *.cpp
-            cp *.so ${SNAPCRAFT_PART_INSTALL}
-        organize:
-            '*.so': modules/
+  znc-playback:
+    after:
+      - znc
+    plugin: nil
+    source: https://github.com/jpnurmi/znc-playback.git
+    source-type: git
+    override-build: |
+      znc-buildmod *.cpp
+      cp *.so ${CRAFT_PART_INSTALL}
+    organize:
+      '*.so': modules/
 
-    znc-push:
-        after:
-            - znc
-        plugin: nil
-        source: https://github.com/jreese/znc-push.git
-        source-type: git
-        override-build: |
-            znc-buildmod *.cpp
-            cp *.so ${SNAPCRAFT_PART_INSTALL}
-        organize:
-            '*.so': modules/
+  znc-push:
+    after:
+      - znc
+    plugin: nil
+    source: https://github.com/jreese/znc-push.git
+    source-type: git
+    override-build: |
+      znc-buildmod *.cpp
+      cp *.so ${CRAFT_PART_INSTALL}
+    organize:
+      '*.so': modules/
 
-    znc-clientbuffer:
-        after:
-            - znc
-        plugin: nil
-        source: https://github.com/CyberShadow/znc-clientbuffer.git
-        source-type: git
-        override-build: |
-            znc-buildmod *.cpp
-            cp *.so ${SNAPCRAFT_PART_INSTALL}
-        organize:
-            '*.so': modules/
+  znc-clientbuffer:
+    after:
+      - znc
+    plugin: nil
+    source: https://github.com/CyberShadow/znc-clientbuffer.git
+    source-type: git
+    override-build: |
+      znc-buildmod *.cpp
+      cp *.so ${CRAFT_PART_INSTALL}
+    organize:
+      '*.so': modules/
 
-    mutter-znc:
-        after:
-            - znc
-        plugin: dump
-        source: https://github.com/seansweda/mutter-push.git
-        organize:
-            'mutter.py': modules/mutter.py
-        prime:
-            - modules
+  mutter-znc:
+    after:
+      - znc
+    plugin: dump
+    source: https://github.com/seansweda/mutter-push.git
+    organize:
+      'mutter.py': modules/mutter.py
+    prime:
+      - modules
 
 build-packages:
-    - cmake
-    - libicu-dev
-    - libperl-dev
-    - libsasl2-dev
-    - libssl-dev
-    - pkg-config
-    - python3-dev
-    - swig3.0
-    - tcl-dev
+  - cmake
+  - libicu-dev
+  - libperl-dev
+  - libsasl2-dev
+  - libssl-dev
+  - pkg-config
+  - python3-dev
+  - swig4.1
+  - tcl-dev
